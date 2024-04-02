@@ -314,6 +314,7 @@ class Python(Package):
     # https://github.com/python/cpython/pull/13306
     conflicts(
         "%gcc platform=darwin",
+        when="@:3.11",
         msg="CPython does not compile with GCC on macOS yet, use clang. "
         "See: https://github.com/python/cpython/pull/13306",
     )
