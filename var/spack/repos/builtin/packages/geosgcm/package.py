@@ -23,6 +23,12 @@ class Geosgcm(CMakePackage):
     variant("debug", default=False, description="Build with debugging")
     variant("f2py", default=False, description="Build with f2py support")
     variant("extdata2g", default=True, description="Use ExtData2G")
+    variant(
+        "develop",
+        default=False,
+        description="Update GEOSgcm_GridComp GEOSgcm_App GMAO_Shared GEOS_Util "
+        "subrepos to their develop branches (used internally for testing)",
+    )
 
     variant(
         "build_type",
@@ -66,7 +72,7 @@ class Geosgcm(CMakePackage):
     # depends_on("fms@2024.01:~gfs_phys+fpic~quad_precision+32bit+64bit+yaml constants=GEOS")
 
     # We also depend on mepo
-    depends_on("mepo@1.52:")
+    depends_on("mepo", type="build")
 
     @run_before("cmake")
     def clone_mepo(self):
