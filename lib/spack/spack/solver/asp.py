@@ -1939,6 +1939,11 @@ class SpackSolverSetup:
             for virtual in virtuals:
                 clauses.append(fn.attr("virtual_on_incoming_edges", spec.name, virtual))
 
+        # If the spec is external and concrete, we allow all the libcs on the system
+        if spec.external and spec.concrete and using_libc_compatibility():
+            for libc in self.libcs:
+                clauses.append(fn.attr("compatible_libc", spec.name, libc.name, libc.version))
+
         # add all clauses from dependencies
         if transitive:
             # TODO: Eventually distinguish 2 deps on the same pkg (build and link)
@@ -2435,7 +2440,7 @@ class SpackSolverSetup:
 
         if using_libc_compatibility():
             for libc in self.libcs:
-                self.gen.fact(fn.allowed_libc(libc.name, libc.version))
+                self.gen.fact(fn.host_libc(libc.name, libc.version))
 
         if not allow_deprecated:
             self.gen.fact(fn.deprecated_versions_not_allowed())
@@ -3794,12 +3799,6 @@ class Solver:
     def __init__(self):
         self.driver = PyclingoDriver()
         self.selector = ReusableSpecsSelector(configuration=spack.config.CONFIG)
-        if spack.platforms.host().name == "cray":
-            msg = (
-                "The Cray platform, i.e. 'platform=cray', will be removed in Spack v0.23. "
-                "All Cray machines will be then detected as 'platform=linux'."
-            )
-            warnings.warn(msg)
 
     @staticmethod
     def _check_input_and_extract_concrete_specs(specs):
